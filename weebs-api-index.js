@@ -1,7 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
-const cors = require("cors");
 
 dotenv.config();
 
@@ -11,8 +10,6 @@ const port = process.env.PORT || 3000;
 app.use(morgan("dev"));
 
 app.use(express.json());
-
-app.use(cors());
 
 /// Use Komikcast route
 app.use("/api/komikcast/", require("./routes/manga-route.js"));
