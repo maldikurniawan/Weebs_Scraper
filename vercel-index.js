@@ -20,5 +20,4 @@ app.use("/api/anoboy/", require("../routes/anoboy-route.js"));
 /// Use Proxy route
 app.use("/api/proxy/", require("../routes/proxy-route.js"));
 
-// ⬅️ ekspor handler untuk vercel
 module.exports = app;

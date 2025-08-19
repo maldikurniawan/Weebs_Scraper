@@ -2,14 +2,14 @@
     "version": 2,
     "builds": [
         {
-            "src": "vercel-index.js",
+            "src": "weebs-api-index.js",
             "use": "@vercel/node"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/vercel-index.js"
+            "dest": "/weebs-api-index.js"
         }
     ]
 }
