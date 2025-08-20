@@ -4,7 +4,7 @@ const cheerio = require("cheerio");
 module.exports.getLatestManga = async (req, res) => {
   const page = req.query.page || 1;
   const keyword = req.query.s;
-  const url = req.protocol + "://" + req.get("host") + req.baseUrl;
+  const url = "https://" + req.get("host") + req.baseUrl;
 
   /// Crawl URL
   let crawlUrl = `${process.env.KOMIKCAST_LINK}/daftar-komik/page/${page}/?sortby=update`;
@@ -98,7 +98,7 @@ module.exports.getLatestManga = async (req, res) => {
 
 module.exports.getMangaByParam = async (req, res) => {
   const { param } = req.params;
-  const url = req.protocol + "://" + req.get("host") + req.baseUrl;
+  const url = "https://" + req.get("host") + req.baseUrl;
 
   let crawlUrl = `${process.env.KOMIKCAST_LINK}/manga/${param}`;
 
