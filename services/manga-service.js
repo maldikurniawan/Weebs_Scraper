@@ -100,7 +100,7 @@ module.exports.getMangaByParam = async (req, res) => {
   const { param } = req.params;
   const url = "https://" + req.get("host") + req.baseUrl;
 
-  let crawlUrl = `${process.env.KOMIKCAST_LINK}/manga/${param}`;
+  let crawlUrl = `${process.env.KOMIKCAST_LINK}/komik/${param}`;
 
   /// Json Result
   let jsonResult = {};
