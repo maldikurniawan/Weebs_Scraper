@@ -7,7 +7,7 @@ module.exports.getLatestManga = async (req, res) => {
   const keyword = req.query.s;
   const tag = req.query.tag || "hot";
   const genre = req.query.genre;
-  const url = req.protocol + "://" + req.get("host") + req.baseUrl;
+  const url = "https://" + req.get("host") + req.baseUrl;
 
   /// Crawl URL
   let crawlUrl = `https://api.komiku.org/other/${tag}/page/${page}/`;
@@ -128,7 +128,7 @@ module.exports.getLatestManga = async (req, res) => {
 
 module.exports.getMangaByParam = async (req, res) => {
   const { param } = req.params;
-  const url = req.protocol + "://" + req.get("host") + req.baseUrl;
+  const url = "https://" + req.get("host") + req.baseUrl;
 
   let crawlUrl = `https://komiku.org/manga/${param}`;
 
@@ -247,7 +247,7 @@ module.exports.getMangaByParam = async (req, res) => {
 
 module.exports.getMangaByParamBatch = async (req, res) => {
   const body = req.body;
-  const url = req.protocol + "://" + req.get("host") + req.baseUrl;
+  const url = "https://" + req.get("host") + req.baseUrl;
 
   console.log(body);
 
