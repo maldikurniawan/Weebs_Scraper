@@ -1,6 +1,7 @@
-const { default: axios } = require("axios");
+const http = require("../../helper/http-helper.js");
 const cheerio = require("cheerio");
 const arrayHelper = require("../../helper/array-helper.js");
+const { wrapWithCorsProxy } = require("../../helper/url-helper.js");
 
 /// Parse latest anime using cheerio
 async function parseLatestAnime(keyword, url, page) {
@@ -27,9 +28,7 @@ async function parseLatestAnime(keyword, url, page) {
 
   try {
     /// Get URL
-    const { data } = await axios.get(getUrl, {
-      proxy: false,
-    });
+    const { data } = await http.get(getUrl);
 
     // Load HTML we fetched in the previous line
     const $ = cheerio.load(data);
@@ -42,7 +41,6 @@ async function parseLatestAnime(keyword, url, page) {
       animeGrid = $(".column-content a");
     }
 
-    /// Anime List
     const animeList = [];
 
     // Loop through all anime grid
@@ -65,9 +63,23 @@ async function parseLatestAnime(keyword, url, page) {
         // Param
         let param = paramArray?.join("~");
 
-        // Image
+        // Image Thumbnail Tag
+        const imageTag = $(el).find("img, amp-img");
+
+        // Search for possible image thumbnail attributes
         let image =
-          `${process.env.ANOBOY_LINK}` + $(el).find("amp-img").attr("src");
+          imageTag.attr("src") ||
+          imageTag.attr("data-src") ||
+          imageTag.attr("data-i-src") ||
+          imageTag.attr("srcset")?.split(" ")[0] ||
+          null;
+
+        // If thumbnail is valid, assign the link
+        if (image && !image.startsWith("http")) {
+          image = process.env.ANOBOY_LINK + image;
+        } else {
+          image = "";
+        }
 
         // Upload time
         let uploadTime = $(el).find(".jamup").text();
@@ -75,7 +87,7 @@ async function parseLatestAnime(keyword, url, page) {
         animeList.push({
           title: title,
           param: param,
-          thumbnail: image,
+          thumbnail: wrapWithCorsProxy(image, url),
           upload_time: uploadTime,
           detail_url: `${url}/${param}`,
         });
