@@ -23,7 +23,8 @@ app.get("/", (req, res) => {
             anoboy: "/api/anoboy",
             komiku: "/api/komiku",
             komikcast: "/api/komikcast",
-            proxy: "/api/proxy"
+            proxy: "/api/proxy",
+            chapterProxy: "/api/chapter-proxy"
         },
         status: "running",
         environment: {
@@ -49,6 +50,9 @@ app.use("/api/anoboy/", require("./routes/anoboy-route.js"));
 
 /// Use Proxy route
 app.use("/api/proxy/", require("./routes/proxy-route.js"));
+
+/// Use Chapter Proxy route
+app.use("/api/chapter-proxy/", require("./routes/chapter-proxy-route.js"));
 
 /// Listen to certain port
 app.listen(port, () => console.log(`server running on port ${port}`));

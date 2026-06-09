@@ -33,7 +33,7 @@ function wrapWithCorsProxy(url, baseUrl) {
   const encodedUrl = encodeURIComponent(url);
 
   // Return the proxied URL
-  return `${baseDomain}/api/proxy?url=${encodedUrl}`;
+  return `${baseDomain}/api/chapter-proxy?url=${encodedUrl}`;
 }
 
 /**
