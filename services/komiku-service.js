@@ -4,6 +4,7 @@ const cheerio = require("cheerio");
 const {
   wrapWithCorsProxy,
   wrapArrayWithCorsProxy,
+  wrapArrayWithCorsProxy2,
 } = require("../helper/url-helper.js");
 
 module.exports.getLatestManga = async (req, res) => {
@@ -321,7 +322,7 @@ module.exports.getMangaChapterByParam = async (req, res) => {
     });
 
     jsonResult = {
-      data: wrapArrayWithCorsProxy(chapterImages, url),
+      data: wrapArrayWithCorsProxy2(chapterImages, url),
     };
 
     res.json(jsonResult);

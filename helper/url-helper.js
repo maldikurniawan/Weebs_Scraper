@@ -33,7 +33,7 @@ function wrapWithCorsProxy(url, baseUrl) {
   const encodedUrl = encodeURIComponent(url);
 
   // Return the proxied URL
-  return `${baseDomain}/api/chapter-proxy?url=${encodedUrl}`;
+  return `${baseDomain}/api/proxy?url=${encodedUrl}`;
 }
 
 /**
@@ -49,6 +49,55 @@ function wrapArrayWithCorsProxy(urls, baseUrl) {
 
   return urls
     .map((url) => wrapWithCorsProxy(url, baseUrl))
+    .filter((url) => url !== null);
+}
+
+/**
+ * Wraps an external URL with the CORS proxy
+ * @param {string} url - The external URL to wrap
+ * @param {string} baseUrl - The base URL of the API (e.g., http://localhost:3000/api/anoboy)
+ * @returns {string|null} - The proxied URL or null if input is invalid
+ */
+function wrapWithCorsProxy2(url, baseUrl) {
+  // Return null for invalid inputs or non-string types
+  if (!url || typeof url !== "string" || url === "") {
+    return null;
+  }
+
+  // Don't wrap if already proxied
+  if (url.includes("/api/chapter-proxy")) {
+    return url;
+  }
+
+  // Don't wrap relative URLs or data URLs
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    return url;
+  }
+
+  // Extract the base domain from baseUrl (e.g., http://localhost:3000)
+  const baseUrlParts = baseUrl.split("/api/");
+  const baseDomain = baseUrlParts[0];
+
+  // Encode the URL to be proxied
+  const encodedUrl = encodeURIComponent(url);
+
+  // Return the proxied URL
+  return `${baseDomain}/api/chapter-proxy?url=${encodedUrl}`;
+}
+
+/**
+ * Wraps an array of URLs with the CORS proxy
+ * @param {string[]} urls - Array of URLs to wrap
+ * @param {string} baseUrl - The base URL of the API
+ * @returns {string[]} - Array of proxied URLs
+ */
+function wrapArrayWithCorsProxy2(urls, baseUrl) {
+  if (!Array.isArray(urls)) {
+    return [];
+  }
+
+  return urls
+    .map((url) => wrapWithCorsProxy2(url, baseUrl))
     .filter((url) => url !== null);
 }
 
@@ -86,4 +135,6 @@ module.exports = {
   wrapWithCorsProxy,
   wrapArrayWithCorsProxy,
   wrapVideoLinksWithCorsProxy,
+  wrapWithCorsProxy2,
+  wrapArrayWithCorsProxy2
 };
