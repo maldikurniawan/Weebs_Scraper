@@ -1,10 +1,14 @@
 // @ts-nocheck
-const { default: axios } = require("axios");
+const http = require("../../helper/http-helper.js");
 const cheerio = require("cheerio");
 const arrayHelper = require("../../helper/array-helper.js");
 const bloggerHelper = require("../../helper/anoboy_helpers/anoboy_blogger_helper.js");
 const AnoboyEmbedLinkHelper = require("../../helper/anoboy_helpers/anoboy_video_link_helper.js");
 const AnoboyEpisodesHelper = require("../../helper/anoboy_helpers/anoboy_episodes_helper.js");
+const {
+  wrapWithCorsProxy,
+  wrapVideoLinksWithCorsProxy,
+} = require("../../helper/url-helper.js");
 
 async function parseAnimeByParam(tempParam, url) {
   /// Json Result
@@ -12,30 +16,18 @@ async function parseAnimeByParam(tempParam, url) {
 
   try {
     /// Get URL
-    const { data } = await axios.get(
-      `${process.env.ANOBOY_LINK}/${tempParam}`,
-      {
-        proxy: false,
-      }
-    );
+    const { data } = await http.get(`${process.env.ANOBOY_LINK}/${tempParam}`);
 
     // Load HTML we fetched in the previous line
     const $ = cheerio.load(data);
 
-    // Embed Links
-    let embedLinks = await AnoboyEmbedLinkHelper.getVideoLinks(data);
-
-    let episodeLinks = [];
-
-    // Episode Links
-    if (tempParam.toLowerCase().includes("episode")) {
-      episodeLinks = await AnoboyEpisodesHelper.getAllEpisodes(data, url);
-    } else {
-      episodeLinks = await AnoboyEpisodesHelper.getEpisodesFromTitleOnly(
-        data,
-        url
-      );
-    }
+    // Fetch Embed Links and Episode Links in parallel
+    const [embedLinks, episodeLinks] = await Promise.all([
+      AnoboyEmbedLinkHelper.getVideoLinks($),
+      tempParam.toLowerCase().includes("episode")
+        ? AnoboyEpisodesHelper.getAllEpisodes($, url)
+        : AnoboyEpisodesHelper.getEpisodesFromTitleOnly($, url),
+    ]);
 
     // Video Links
     var videoLinks =
@@ -61,8 +53,16 @@ async function parseAnimeByParam(tempParam, url) {
         .trim();
     }
 
-    // Thumbnail
-    let thumbnail = $(".entry-content").find("amp-img").attr("src");
+    // Image Thumbnail Tag
+    const thumbnailTag = $(".entry-content").find("img, amp-img");
+
+    // Search for possible image thumbnail attributes
+    let thumbnail =
+      thumbnailTag.attr("src") ||
+      thumbnailTag.attr("data-src") ||
+      thumbnailTag.attr("data-i-src") ||
+      thumbnailTag.attr("srcset")?.split(" ")[0] ||
+      null;
 
     // Episode Navigation
     let episodeNavigation = [];
@@ -96,7 +96,10 @@ async function parseAnimeByParam(tempParam, url) {
       data: {
         name: name,
         synopsis: sinopsis,
-        thumbnail: `${process.env.ANOBOY_LINK}${thumbnail}`,
+        thumbnail: wrapWithCorsProxy(
+          `${process.env.ANOBOY_LINK}${thumbnail}`,
+          url
+        ),
         episode_navigation:
           episodeLinks.length > 1 ? episodeLinks : episodeNavigation,
         video_embed_links: videoLinks,
